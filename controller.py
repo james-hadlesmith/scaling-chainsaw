@@ -4,7 +4,7 @@ import json
 import requests
 import time
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "challenges.ctfd.io:30020"
 
 
 def main():
@@ -77,8 +77,6 @@ def sendCMD(id, cmd):
 def getIDS():
     resp = requests.get(BASE_URL + "/clients")
     r = json.loads(resp.text)
-
-    # INTEL(I_C2_THERE!)
 
     return [r['online'], r['offline']]
 
